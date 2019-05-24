@@ -78,14 +78,14 @@ let appData = {
         
         appData.income.forEach(function(item, i, mass) {
             // alert('Способы доп. заработка: ' + item);
-            let n = i + 1;
-            alert('Способы доп. заработка: ' + n + ': ' + item);
+            // let n = i + 1;
+            alert('Способы доп. заработка: ' + (i+1) + ': ' + item);
         });
     },
 };
 
 for (let key in appData) {
-    console.log('Наша программа включает в себя данные: ' + key);
+    console.log('Наша программа включает в себя данные: ' + key + " - " + appData[key]);
 };
 
 // Вариант цикла с while:
