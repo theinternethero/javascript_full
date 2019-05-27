@@ -40,8 +40,8 @@ startBtn.addEventListener('click', function() {
 	appData.timeData = time;
 	budgetValue.textContent = money.toFixed(); // округляем до целого число
 	yearValue.value = new Date(Date.parse(time)).getFullYear(); // с инпутами работаем только с value, не с textContent или innerHTML
-	// выше мы создаем новую дату, а Date это объект и имеющий свои методы, один из методов это Date.parse(), он преобразовывает введеное значение с миллисекунды пройденное с 1970 года, а после с помощью метода getFullYear мы это значение преобразовываем в полные года
-	monthValue.value = new Date(Date.parse(time)).getMonth() + 1; // так как в js все начинается с нуля, мы прибавляем +1
+	// выше мы создаем новую дату, а Date это объект и имеющий свои методы, один из методов это Date.parse(), он преобразовывает введеное значение в миллисекунды, пройденные с 1970 года, а после с помощью метода getFullYear мы это значение преобразовываем в полные года
+	monthValue.value = new Date(Date.parse(time)).getMonth() + 1; // так как в js все начинается с нуля и месяц не искключение, мы прибавляем +1 
 	dayValue.value = new Date(Date.parse(time)).getDate();
 });
 
@@ -49,8 +49,8 @@ expensesBtn.addEventListener('click', function() {
 	if (appData.budget != undefined ) {
 	let sum = 0; // создаем сумму всех обязательных расходов
 	for (let i = 0; i < expensesItem.length; i++) { // expensesItem - псевдомассив, length это последний индекс +1
-		let a = expensesItem[i].value, // помещаем в переменную значение value каждого элемента по порядку от 0 до 3
-			b = expensesItem[++i].value; // а в переменную b помещаем value i + 1, то есть 0+1 это второй и так далее
+		let a = expensesItem[i].value, // каждое нечетное помещаем в переменную value каждого элемента по порядку от 0 до 3, это будет ключ элемента
+			b = expensesItem[++i].value; // каждое четное помещаем в переменную b помещаем value i + 1, то есть 0 + 1 это второй и так далее, это будет значение ключа
 		// Ниже: 1 условие: a строго равно строке, 2 и 3 условия: a и b не равны отмене, 4 и 5: a и b не равны пустой строке и количество символов a меньше 50
 		if ( (typeof(a))=== 'string' && (typeof(a)) != null && (typeof(b)) != null && a != '' && b != '' && a.length < 50) {
 			console.log('done');
@@ -70,8 +70,8 @@ optionalExpensesBtn.addEventListener('click', function() {
 	if (appData.budget != undefined ) {
 	for (let i = 0; i < optionalExpensesItem.length; i++) {
 		let answer = optionalExpensesItem[i].value;
-		appData.optionalExpenses[i] = answer; // каждому ключу по порядку от 0 до 3 присваиваем значение по порядку
-		optionalExpensesValue.textContent += appData.optionalExpenses[i] + ' '; // в поле выводим каждый элемент
+		appData.optionalExpenses[i] = answer; // каждому ключу объекта optionalExpenses по порядку от 0 до 3 присваиваем значение по порядку псевдомассива optionalExpensesItem
+		optionalExpensesValue.textContent += appData.optionalExpenses[i] + ' '; // в поле выводим каждый элемент каждую итерацию через пробел
 	}
 	} else {
 		optionalExpensesBtn.disabled = true;
@@ -87,10 +87,7 @@ countBtn.addEventListener('click', function() {
 			// toFixed() возвращает строковое значение
 			dayBudgetValue.textContent = appData.moneyPerDay;
 		} else {
-			appData.moneyPerDay = (appData.budget / 30).toFixed(); // создаем свойство/метод объекта appData
-			// toFixed() - метод, пустые скобки округляет до ближайшего целого
-			// если toFixed(1) , то до первого знака после запятой
-			// toFixed() возвращает строковое значение
+			appData.moneyPerDay = (appData.budget / 30).toFixed();
 			dayBudgetValue.textContent = appData.moneyPerDay;
 		}
 		
