@@ -1,4 +1,4 @@
-window.addEventListener('DOMContentLoaded', function() { // Скрипт будет выполняться только после того, как прогрузиться DOM дерево (HTML)
+window.addEventListener('DOMContentLoaded', () => { // Скрипт будет выполняться только после того, как прогрузиться DOM дерево (HTML)
 
     'use strict'; // Активен строгий режим
     let tabContent = document.querySelectorAll('.info-tabcontent'), // Псевдомассив со всеми таб контентами от 0 до 4
@@ -29,7 +29,7 @@ window.addEventListener('DOMContentLoaded', function() { // Скрипт буд�
     }
 
     // 3) Назначение обработчика событий при клике на каждый из наш табов через делигирование событий
-    info.addEventListener('click', function(event) { // объект event, ведь мы будем сравнивать куда мы кликаем
+    info.addEventListener('click', (event) => { // объект event, ведь мы будем сравнивать куда мы кликаем
         let target = event.target; // помещаем в переменную на что именно происходит клик
         if (target && target.classList.contains('info-header-tab')) { // проверка на то, что таргет вообще есть и то что мы тыкнули именно на элемент с классом info-header-tab
             // 4) Здесь нам необходимо определить что каждый таб связан со своим табконтентом
@@ -51,10 +51,10 @@ window.addEventListener('DOMContentLoaded', function() { // Скрипт буд�
     // 3) Написать функцию, которая будет передавать данные на страницу
     // 4) Написать функцию, которая будет обновлять эти данные, каждую секунду, если у нас таймер
     
-    // 1)
-    let deadline = '2019-05-29';
+    // 1) Задать дедлайн, время до которого наш таймер будет отсчитывать:
+    let deadline = '2019-05-30';
     
-    // 2)
+    // 2) Получить разницу между дедлайном и текущем временем и из этого значения вытащить секунды, минуты, часы:
     function getTimeRemaining(endtime) { // функция, которая будет считать разницу между дедлайном и текущем временем
         // endtime - аргумент, дата дедлайн в будущем
         let t = Date.parse(endtime) - Date.parse(new Date()), // разница между дедлайном и текущим временем
@@ -76,7 +76,7 @@ window.addEventListener('DOMContentLoaded', function() { // Скрипт буд�
         };
     }
     
-    // 3)
+    // 3) Написать функцию, которая будет передавать данные на страницу:
     function setClock(id, endtime) { // аргумент id - это айди родителя всех спанов со значениями, то есть айди обертки, куда мы будем вставлять все значения
         let timer = document.getElementById(id), // указанный id обертки
             hours = timer.querySelector('.hours'), // querySelector получает первый элемент с таким классом на странице
@@ -134,13 +134,32 @@ window.addEventListener('DOMContentLoaded', function() { // Скрипт буд�
         close = document.querySelector('.popup-close'),
         descriptionBtn = document.querySelectorAll('.description-btn');
     
-    for (let i = 0; i < descriptionBtn.length; i++) {
-        descriptionBtn[i].addEventListener('click', function() {
-        overlay.style.display = 'block';
-        this.classList.add('more-splash');
-        document.body.style.overflow = 'hidden';
+    // Мой вариант:
+    // for (let i = 0; i < descriptionBtn.length; i++) {
+    //     descriptionBtn[i].addEventListener('click', function() {
+    //     overlay.style.display = 'block';
+    //     this.classList.add('more-splash');
+    //     document.body.style.overflow = 'hidden';
+    //     });
+    // };
+
+    // Вариант с forEach (ошибка потому что нельзя использовать стрелочную функцию в обработчике событий она не имеет контекста вызова):
+    // descriptionBtn.forEach((descriptionBtn) => { // перебираю созданный массив аргументом является целый массив
+    //     descriptionBtn.addEventListener('click', () => { // вешаю событие
+    //         overlay.style.display = 'block';
+    //         this.classList.add('more-splash'); // работать не будет брат
+    //         document.body.style.overflow = 'hidden';
+    //     });
+    // });
+
+    // Правильно (в ES5):
+    descriptionBtn.forEach(function(descriptionBtn) { // перебираю созданный массив аргументом является целый массив
+        descriptionBtn.addEventListener('click', function() { // вешаю событие
+            overlay.style.display = 'block';
+            this.classList.add('more-splash');
+            document.body.style.overflow = 'hidden';
         });
-    };
+    });
     
     more.addEventListener('click', function() {
         overlay.style.display = 'block';
@@ -148,12 +167,35 @@ window.addEventListener('DOMContentLoaded', function() { // Скрипт буд�
         document.body.style.overflow = 'hidden'; // запретили прокрутку странице при открытом модальном окном
     });
 
-    close.addEventListener('click', function() {
+    close.addEventListener('click', function() { // здесь можно использовать стрелочные функции, но хз зачем
         for (let i = 0; i < descriptionBtn.length; i++) {
             descriptionBtn[i].classList.remove('more-splash');
         }
         overlay.style.display = 'none';
         more.classList.remove('more-splash');
         document.body.style.overflow = ''; // возвращем в исходное состояние
+    });
+
+    overlay.addEventListener('click', function(event) { // функция, реализующая закрытие попапа при клике на overlay
+        if(event.target == overlay) { // проверка на то что, именно когда мы тыкаем по overlay закрывалось модальное окно
+            for (let i = 0; i < descriptionBtn.length; i++) { 
+                descriptionBtn[i].classList.remove('more-splash');
+            }
+            this.style.display = 'none';
+            more.classList.remove('more-splash');
+            document.body.style.overflow = '';
+        }
+    });
+
+    // Плавная прокрутка:
+    let menu = document.getElementsByTagName('nav')[0];
+    menu.addEventListener('click', function(event) {
+        event.preventDefault(); // отменили действия по умолчанию;
+        let target = event.target, // создали переменную в которой будет кликнутая ссылка
+            blockID = target.getAttribute('href'), // эта переменная, в этой кликнутей ссылке будет помещен атрибут ссылка
+            blockTarget = document.querySelectorAll(blockID)[0]; // хз
+        blockTarget.scrollIntoView({ // 
+            behavior: "smooth" // судя по всему анимация хз
+        })
     });
 });
